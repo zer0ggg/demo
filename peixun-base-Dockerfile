@@ -1,0 +1,21 @@
+FROM centos:7
+ENV MYPATH /peixun
+WORKDIR $MYPATH
+RUN yum install java-1.8.0-openjdk* -y
+# 安装必要的软件包
+RUN yum -y install -y wget tar
+RUN yum -y install which
+# 下载并解压Maven
+RUN wget https://archive.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz && \
+    tar -xzf apache-maven-3.6.2-bin.tar.gz && \
+    rm apache-maven-3.6.2-bin.tar.gz && \
+    mv apache-maven-3.6.2 /usr/local/bin/
+
+# 设置环境变量
+ENV MAVEN_HOME /usr/local/bin/apache-maven-3.6.2
+ENV PATH $MAVEN_HOME/bin:$PATH
+RUN sed -i -e 's/<mirrors>/&    <mirror>      <id>aliyun-public<\/id>      <url>http:\/\/maven.aliyun.com\/repository\/public<\/url>      <mirrorOf>*<\/mirrorOf>    <\/mirror>/' /usr/local/bin/apache-maven-3.6.2/conf/settings.xml
+RUN yum -y install git
+
+EXPOSE 7777
+CMD ["/usr/sbin/init"]
